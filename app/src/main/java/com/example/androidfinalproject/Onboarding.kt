@@ -1,5 +1,7 @@
 package com.example.androidfinalproject
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,11 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,10 +38,10 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun Onboarding(navController: NavHostController) {
-    var firstName by rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    var lastName by rememberSaveable { mutableStateOf(TextFieldValue("")) }
-    var email by rememberSaveable { mutableStateOf(TextFieldValue("")) }
-
+    var firstName by remember { mutableStateOf(TextFieldValue("")) }
+    var lastName by remember { mutableStateOf(TextFieldValue("")) }
+    var email by remember { mutableStateOf(TextFieldValue("")) }
+    val context = LocalContext.current
     Column(
         modifier = Modifier.padding(top = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -72,7 +75,9 @@ fun Onboarding(navController: NavHostController) {
             text = "Personal Information",
             fontSize = 19.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Start).padding(start = 16.dp)
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(start = 16.dp)
         )
         Spacer(modifier = Modifier.height(30.dp))
         OutlinedTextField(
@@ -102,7 +107,27 @@ fun Onboarding(navController: NavHostController) {
         )
         Spacer(modifier = Modifier.height(48.dp))
         Button(
-            onClick = {},
+            onClick = {
+                if (firstName.text.isBlank() || email.text.isBlank() || lastName.text.isBlank()) {
+                    Toast.makeText(
+                        context,
+                        "Register unsuccessfully. Please enter all fields",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }else {
+                    val sharedPreferences = context.getSharedPreferences("UserData", Context.MODE_PRIVATE)
+                    with(sharedPreferences.edit()) {
+                        putString("firstName", firstName.text)
+                        putString("lastName", lastName.text)
+                        putString("email", email.text)
+                        apply()
+                    }
+                    Toast.makeText(context, "Saved Successfully", Toast.LENGTH_SHORT).show()
+                    navController.navigate(Home.route) {
+                        popUpTo(Onboarding.route){inclusive=true}
+                    }
+                }
+            },
             border = BorderStroke(1.dp, color = Color(0xFF9E661B)),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF4CE14)),
