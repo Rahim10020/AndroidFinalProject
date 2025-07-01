@@ -31,15 +31,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
 @Composable
-@Preview(showBackground = true)
-fun OnboardingPreview() {
-    Onboarding()
-}
-
-@Composable
-fun Onboarding() {
+fun Onboarding(navController: NavHostController) {
     var firstName by rememberSaveable { mutableStateOf(TextFieldValue("")) }
     var lastName by rememberSaveable { mutableStateOf(TextFieldValue("")) }
     var email by rememberSaveable { mutableStateOf(TextFieldValue("")) }
